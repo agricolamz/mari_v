@@ -1,0 +1,26 @@
+---
+title: "Listen to Mari v"
+format: html
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+readxl::read_xlsx("Mari_v_acc.xlsx") |> 
+  mutate(audio = str_remove(source, ".eaf"),
+         audio = str_c(audio, "-", round(as.double(time_start)*1000)),
+         audio = str_c(audio, "-", round(as.double(time_end)*1000)),
+         audio = str_c("http://lingconlab.ru/MariRus/OUT/", audio, ".wav")) |> 
+  mutate(id = 1:n()) |> 
+  select(id, sentence, audio) ->
+df
+
+writexl::write_xlsx(df, "fill_me.xlsx")
+
+df |>   
+  mutate(audio = str_glue('<audio controls="" preload="none"><source src="{audio}" type="audio/ogg"></audio> ')) |> 
+  arrange(id) |> 
+  DT::datatable(escape = FALSE, rownames = FALSE)
+```
